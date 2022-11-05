@@ -9,33 +9,42 @@ class Workspace_Scan {
     [string]$Status
     [string]$ScanID
 }
+function Get-ModifiedWorkspaces {
+#$WorspaceScans = @()
+    #$Workspace_Scan1 = [Workspace_Scan]::new()
+    #$Workspace_Scan1.WS_ID = '01'
+    #$Workspace_Scan1.Status = 'W2S'
+    #$global:WorkspaceScans += $Workspace_Scan1
+    #
+    #$Workspace_Scan2 = [Workspace_Scan]::new()
+    #$Workspace_Scan2.WS_ID = '02'
+    #$Workspace_Scan2.Status = 'W2S'
+    #$global:WorkspaceScans += $Workspace_Scan2
+    #
+    #$Workspace_Scan3 = [Workspace_Scan]::new()
+    #$Workspace_Scan3.WS_ID = '03'
+    #$Workspace_Scan3.Status = 'W2S'
+    #$global:WorkspaceScans += $Workspace_Scan3
 
+    $i = 0
+    while ($i -lt 100){
+        $Workspace_Scan3 = [Workspace_Scan]::new()
+        $Workspace_Scan3.WS_ID = $i
+        $Workspace_Scan3.Status = 'W2S'
+        $global:WorkspaceScans += $Workspace_Scan3
+        $i += 1
+    }
+}
 $global:WorkspaceScans = @()
 $global:LoopSleepSeconds = 5
-$global:MaxParallelScans = 2
-$global:MaxScanRequestsPerH = 2 #500
-$global:MaxStatusRequestsPerH = 10000
-$global:MaxScanResultsPerH = 500
+$global:MaxParallelScans = 16
+$global:MaxScanRequestsPerH = 20 #500
+$global:MaxStatusRequestsPerH = 50 #10000
+$global:MaxScanResultsPerH = 30 #500
 $global:WorkspaceStatusRequestDates = @()
 
 
-function Get-ModifiedWorkspaces {
-#$WorspaceScans = @()
-    $Workspace_Scan1 = [Workspace_Scan]::new()
-    $Workspace_Scan1.WS_ID = '01'
-    $Workspace_Scan1.Status = 'W2S'
-    $global:WorkspaceScans += $Workspace_Scan1
 
-    $Workspace_Scan2 = [Workspace_Scan]::new()
-    $Workspace_Scan2.WS_ID = '02'
-    $Workspace_Scan2.Status = 'W2S'
-    $global:WorkspaceScans += $Workspace_Scan2
-    
-    $Workspace_Scan3 = [Workspace_Scan]::new()
-    $Workspace_Scan3.WS_ID = '03'
-    $Workspace_Scan3.Status = 'W2S'
-    $global:WorkspaceScans += $Workspace_Scan3
-}
 
 function Get-WorkspacesCount {
     $global:WorkspaceScans.count
@@ -95,7 +104,7 @@ function Get-WorkspacesStatistics {
     Write-Host 'Workspaces array statistics:'
     Write-Host '# Workspaces array    :' $global:WorkspaceScans.Count
     Write-Host '# W2S                 :' $(Get-WorkspacesCountW2S)
-    Write-Host '# WIS                 :' $(Get-WorkspacesCountWIS)
+    Write-Host '# WIS                 :' $(Get-WorkspacesCountWIS) '/' $global:MaxParallelScans
     Write-Host '# WSR                 :' $(Get-WorkspacesCountWSR)
     Write-Host '# WRE                 :' $(Get-WorkspacesCountWRE)
     Write-Host '# WSReady             :' $(Get-WorkspacesCountWSReady)
@@ -154,8 +163,8 @@ function Get-WorkspaceScanResults {
 }
 
 function Get-ScanRequestCountLastH {
-    $DateLastH = $(Get-date).AddHours(-1)
-    #$DateLastH = $(Get-date).AddSeconds(-20)
+    #$DateLastH = $(Get-date).AddHours(-1)
+    $DateLastH = $(Get-date).AddSeconds(-20)
     $i = 0
     foreach ($workspaceScan in $global:WorkspaceScans) {
         IF ($workspaceScan.ScanStartDate -ge $DateLastH) {
@@ -166,7 +175,8 @@ function Get-ScanRequestCountLastH {
 }
 
 function Get-ResultFetchesCountLastH {
-    $DateLastH = $(Get-date).AddHours(-1)
+    #$DateLastH = $(Get-date).AddHours(-1)
+    $DateLastH = $(Get-date).AddSeconds(-20)
     $i = 0
     foreach ($workspaceScan in $global:WorkspaceScans) {
         IF ($workspaceScan.ScanResultRequestStartDate -ge $DateLastH) {
@@ -177,7 +187,8 @@ function Get-ResultFetchesCountLastH {
 }
 
 function Get-StatusRequestCountLastH {
-    $DateLastH = $(Get-date).AddHours(-1)
+    #$DateLastH = $(Get-date).AddHours(-1)
+    $DateLastH = $(Get-date).AddSeconds(-20)
     $i = 0
     foreach ($WorkspaceStatusRequestDate in $global:WorkspaceStatusRequestDates) {
         IF ($WorkspaceStatusRequestDate -ge $DateLastH) {
